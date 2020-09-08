@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import filedialog
 import pyodbc
 import os
+from datetime import datetime
 
 root = Tk()
 root.title("Image Uploader To DB")
@@ -38,9 +39,9 @@ txtUNPassword.pack()
 laFolderPath = Label(root, text="ფაილის მისამართი")
 laFolderPath.pack()
 
-
 txtFolderPath = Entry(root, width=50, borderwidth=5)
 txtFolderPath.pack()
+
 
 def folderPath():
     txtFolderPath.delete(0, END)
@@ -63,6 +64,17 @@ def saveImage(PictureLocation, IdProd, cursor):
 
         cursor.execute(strcomm, (bindata, IdProd))
 
+def CreateTXTFile(unSuccessfulIdProds, directory):
+    try:
+        txtFileileName = 'ErrorIdProds.txt'
+        newFile= os.path.join(directory,txtFileileName)
+        f = open(newFile, 'w+')
+        f.write(str(datetime.now()) + ' \n')
+        for i in unSuccessfulIdProds:
+            f.write(i + "\n")
+        f.close()
+    except:
+        print("ERROR")
 
 def myClick():
     # Connection String
@@ -78,6 +90,8 @@ def myClick():
     # Folder Path
     directory = str(txtFolderPath.get())
 
+    unSuccessfulIdProds = []
+
     # Loop Though Folder To Get All Images
     for filename in os.listdir(directory):
 
@@ -91,11 +105,13 @@ def myClick():
                 PictureLocation = fileDirectory + '/' + picture
                 saveImage(PictureLocation, IdProd, cursor)
         else:
-            print(IdProd + "არ მოიძებნა")
+            unSuccessfulIdProds.append(IdProd)
 
     cnxn.commit()
-    laEndNotification = Label(root, text="ატვირთვა დასრულდა")
+    laEndNotification = Label(root, text= str(datetime.now()) + " ატვირთვა დასრულდა")
     laEndNotification.pack()
+    if len(unSuccessfulIdProds) > 0:
+        CreateTXTFile(unSuccessfulIdProds, directory)
 
 
 # Folder - ის არჩევა
