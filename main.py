@@ -75,11 +75,18 @@ def myClick():
     for filename in os.listdir(directory):
 
         IdProd = nameTrimer(filename)
-        filedirectory = directory + '/' + filename
+        fileDirectory = directory + '/' + filename
 
-        for picture in os.listdir(filedirectory):
-            PictureLocation = filedirectory + '/' + picture
-            saveImage(PictureLocation, IdProd, cursor)
+        cursor.execute("SELECT Prod From Prod WHERE IdProd = ?", IdProd)
+
+        if len(cursor.fetchall()) > 0:
+            for picture in os.listdir(fileDirectory):
+                PictureLocation = fileDirectory + '/' + picture
+                saveImage(PictureLocation, IdProd, cursor)
+        else:
+            print(IdProd + "არ მოიძებნა")
+
+
 
     cnxn.commit()
     laEndNotification = Label(root, text="ატვირთვა დასრულდა")
