@@ -48,7 +48,16 @@ def nameTrimer(fileName):
 
 
 # Saveing TO DB
-def saveImage(PictureLocation, IdProd):
+def saveImage(PictureLocation, IdProd, cursor):
+    with open(PictureLocation, 'rb') as f:
+        bindata = f.read()
+
+        strcomm = "insert into ProdPicture (ProdPicture, Idprod) values (?,?) "
+
+        cursor.execute(strcomm, (bindata, IdProd))
+
+
+def myClick():
     # Connection String
     server = txtServerName.get()
     database = txtDBName.get()
@@ -59,16 +68,6 @@ def saveImage(PictureLocation, IdProd):
         'DRIVER={SQL Server};SERVER=' + server + ';DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
     cursor = cnxn.cursor()
 
-    with open(PictureLocation, 'rb') as f:
-        bindata = f.read()
-
-        strcomm = "insert into ProdPicture (ProdPicture, Idprod) values (?,?) "
-
-        cursor.execute(strcomm, (bindata, IdProd))
-        cnxn.commit()
-
-
-def myClick():
     # Folder Path
     directory = str(txtFolderPath.get())
 
@@ -80,10 +79,12 @@ def myClick():
 
         for picture in os.listdir(filedirectory):
             PictureLocation = filedirectory + '/' + picture
-            saveImage(PictureLocation, IdProd)
+            saveImage(PictureLocation, IdProd, cursor)
 
-    laEndNotification = Label(root, text = "ატვირთვა დასრულდა")
+    cnxn.commit()
+    laEndNotification = Label(root, text="ატვირთვა დასრულდა")
     laEndNotification.pack()
+
 
 # ასატვირთვი ღილაკი
 myButton = Button(root, text="ატვირთვა", command=myClick)
