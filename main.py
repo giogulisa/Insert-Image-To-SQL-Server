@@ -1,8 +1,10 @@
 from tkinter import *
+from tkinter import filedialog
 import pyodbc
 import os
 
 root = Tk()
+root.title("Image Uploader To DB")
 
 # SQL Server Name Input
 laServerName = Label(root, text="სერვერის დასახელება")
@@ -36,8 +38,13 @@ txtUNPassword.pack()
 laFolderPath = Label(root, text="ფაილის მისამართი")
 laFolderPath.pack()
 
+
 txtFolderPath = Entry(root, width=50, borderwidth=5)
 txtFolderPath.pack()
+
+def folderPath():
+    txtFolderPath.delete(0, END)
+    txtFolderPath.insert(0, filedialog.askdirectory())
 
 
 # Trimming IdProd From FileName
@@ -86,12 +93,14 @@ def myClick():
         else:
             print(IdProd + "არ მოიძებნა")
 
-
-
     cnxn.commit()
     laEndNotification = Label(root, text="ატვირთვა დასრულდა")
     laEndNotification.pack()
 
+
+# Folder - ის არჩევა
+myFButton = Button(root, text="Folder - ის არჩევა", command=folderPath)
+myFButton.pack()
 
 # ასატვირთვი ღილაკი
 myButton = Button(root, text="ატვირთვა", command=myClick)
